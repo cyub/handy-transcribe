@@ -214,6 +214,13 @@ pipe. With `--json`:
 GPU acceleration beyond Metal (Vulkan/CUDA for Linux and Windows) requires enabling the
 corresponding `transcribe-cpp-sys` features and rebuilding; see the crate's docs.
 
+## Translations
+
+This README is maintained in English and 简体中文. Other languages are welcome — open an issue or a PR.
+
+A short quick-start translation is enough: the reference tables above (options, models, platform
+support) change with every release, so link back to this file instead of duplicating them.
+
 ## License
 
 Code: MIT — see [LICENSE](LICENSE).

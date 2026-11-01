@@ -131,6 +131,13 @@ handy-transcribe ./audio.mp3
 | Linux arm64 | ✅ CI 在原生 ARM runner 构建（CPU 后端） |
 | Windows | ⚠️ 未测试，欢迎 PR |
 
+## 其他语言
+
+本 README 目前维护 English 与简体中文两版，其他语言欢迎提 issue 或 PR。
+
+写个"快速上手"级别的短版就够了：上面那几张表格（参数、模型、平台支持）每轮发版都会变，
+不需要逐字翻译，指向本文件即可。
+
 ## 许可证
 
 代码 MIT，见 [LICENSE](LICENSE)。模型许可证单独计算。

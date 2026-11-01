@@ -8,6 +8,9 @@ All notable changes to this project are documented here. The format follows
 
 ### Documentation
 
+- READMEs now invite community translations and explain that a quick-start level translation is
+  enough, since the reference tables change every release.
+
 - README now leads with a project logo, a language switcher (English / 简体中文) and a badge row fed by
   live crates.io version, download count and license, plus CI status and the latest release.
 
