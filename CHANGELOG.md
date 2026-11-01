@@ -6,6 +6,11 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Documentation
+
+- README now leads with a project logo, a language switcher (English / 简体中文) and a badge row fed by
+  live crates.io version, download count and license, plus CI status and the latest release.
+
 ## [0.1.1] - 2026-11-01
 
 ### Fixed

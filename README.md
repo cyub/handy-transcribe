@@ -1,23 +1,44 @@
-# handy-transcribe
+<p align="center">
+  <img src="assets/logo.svg" width="72" height="72" alt="handy-transcribe logo">
+</p>
 
-**Offline speech-to-text for audio files and URLs — one Rust binary, no API keys, no audio leaving your machine.**
+<h1 align="center">handy-transcribe</h1>
+
+<p align="center">
+  <strong>English</strong> ·
+  <a href="README.zh-CN.md">简体中文</a>
+</p>
+
+<p align="center">
+  <a href="https://crates.io/crates/handy-transcribe">
+    <img src="https://img.shields.io/crates/v/handy-transcribe?style=flat&logo=rust" alt="crates.io">
+  </a>
+  <a href="https://crates.io/crates/handy-transcribe">
+    <img src="https://img.shields.io/crates/d/handy-transcribe?style=flat" alt="downloads">
+  </a>
+  <a href="https://github.com/cyub/handy-transcribe/actions/workflows/ci.yml">
+    <img src="https://img.shields.io/github/actions/workflow/status/cyub/handy-transcribe/ci.yml?style=flat&logo=githubactions&logoColor=white" alt="CI">
+  </a>
+  <a href="https://github.com/cyub/handy-transcribe/releases">
+    <img src="https://img.shields.io/github/v/release/cyub/handy-transcribe?style=flat&logo=github" alt="release">
+  </a>
+  <a href="LICENSE">
+    <img src="https://img.shields.io/crates/l/handy-transcribe?style=flat" alt="license">
+  </a>
+  <img src="https://img.shields.io/badge/rust-1.85%2B-dea584?style=flat&logo=rust" alt="MSRV">
+  <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Linux-555?style=flat" alt="Platform">
+</p>
+
+<p align="center">Offline speech-to-text for audio files and URLs — one Rust binary, no API keys, no audio leaving your machine.</p>
 
 `handy-transcribe` is a small command-line front end for the same pipeline that powers
 [Handy](https://github.com/cjpais/Handy): `decode → VAD chunking → transcribe.cpp (ggml) inference →
 join → post-process`. Recording, UI, and clipboard plumbing are stripped away, leaving a headless CLI
 you can script, batch, or wire into an agent.
 
-[![CI](https://github.com/cyub/handy-transcribe/actions/workflows/ci.yml/badge.svg)](https://github.com/cyub/handy-transcribe/actions/workflows/ci.yml)
-[![crates.io](https://img.shields.io/crates/v/handy-transcribe.svg)](https://crates.io/crates/handy-transcribe)
-[![downloads](https://img.shields.io/crates/d/handy-transcribe.svg)](https://crates.io/crates/handy-transcribe)
-[![release](https://img.shields.io/github/v/release/cyub/handy-transcribe.svg)](https://github.com/cyub/handy-transcribe/releases/latest)
-[![license](https://img.shields.io/badge/license-MIT-blue.svg)](#license)
-
 > **Unofficial.** This is a community CLI built on top of Handy's pipeline and the
 > [`transcribe-cpp`](https://github.com/handy-computer/transcribe.cpp) engine. It is not affiliated
 > with, or endorsed by, the Handy project or handy-computer.
-
----
 
 ## Why another transcription CLI?
 

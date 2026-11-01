@@ -1,14 +1,39 @@
-# handy-transcribe
+<p align="center">
+  <img src="assets/logo.svg" width="72" height="72" alt="handy-transcribe logo">
+</p>
 
-**本地离线语音转写：给一个音频文件或 URL，输出文本。单个 Rust 二进制，不要 API key，音频不出本机。**
+<h1 align="center">handy-transcribe</h1>
+
+<p align="center">
+  <a href="README.md">English</a> ·
+  <strong>简体中文</strong>
+</p>
+
+<p align="center">
+  <a href="https://crates.io/crates/handy-transcribe">
+    <img src="https://img.shields.io/crates/v/handy-transcribe?style=flat&logo=rust" alt="crates.io">
+  </a>
+  <a href="https://crates.io/crates/handy-transcribe">
+    <img src="https://img.shields.io/crates/d/handy-transcribe?style=flat" alt="下载量">
+  </a>
+  <a href="https://github.com/cyub/handy-transcribe/actions/workflows/ci.yml">
+    <img src="https://img.shields.io/github/actions/workflow/status/cyub/handy-transcribe/ci.yml?style=flat&logo=githubactions&logoColor=white" alt="CI">
+  </a>
+  <a href="https://github.com/cyub/handy-transcribe/releases">
+    <img src="https://img.shields.io/github/v/release/cyub/handy-transcribe?style=flat&logo=github" alt="Release">
+  </a>
+  <a href="LICENSE">
+    <img src="https://img.shields.io/crates/l/handy-transcribe?style=flat" alt="许可证">
+  </a>
+  <img src="https://img.shields.io/badge/rust-1.85%2B-dea584?style=flat&logo=rust" alt="MSRV">
+  <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Linux-555?style=flat" alt="平台">
+</p>
+
+<p align="center">本地离线语音转写：给一个音频文件或 URL，输出文本。单个 Rust 二进制，不要 API key，音频不出本机。</p>
 
 `handy-transcribe` 是 [Handy](https://github.com/cjpais/Handy) 那条流水线的命令行外壳：
 `解码 → VAD 分块 → transcribe.cpp (ggml) 推理 → 拼接 → 后处理`。去掉了录音 / UI / 剪贴板部分，
 只留下可以脚本化、批量跑、给 agent 调用的无头 CLI。
-
-[![CI](https://github.com/cyub/handy-transcribe/actions/workflows/ci.yml/badge.svg)](https://github.com/cyub/handy-transcribe/actions/workflows/ci.yml)
-[![crates.io](https://img.shields.io/crates/v/handy-transcribe.svg)](https://crates.io/crates/handy-transcribe)
-[![license](https://img.shields.io/crates/l/handy-transcribe.svg)](#许可证)
 
 > **非官方项目。** 基于 Handy 的流水线与
 > [`transcribe-cpp`](https://github.com/handy-computer/transcribe.cpp) 引擎构建的社区 CLI，
