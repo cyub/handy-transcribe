@@ -8,9 +8,8 @@ join → post-process`. Recording, UI, and clipboard plumbing are stripped away,
 you can script, batch, or wire into an agent.
 
 [![CI](https://github.com/cyub/handy-transcribe/actions/workflows/ci.yml/badge.svg)](https://github.com/cyub/handy-transcribe/actions/workflows/ci.yml)
-[![crates.io](https://img.shields.io/crates/v/handy-transcribe.svg)](https://crates.io/crates/handy-transcribe)
-[![downloads](https://img.shields.io/crates/d/handy-transcribe.svg)](https://crates.io/crates/handy-transcribe)
-[![license](https://img.shields.io/crates/l/handy-transcribe.svg)](#license)
+[![release](https://img.shields.io/github/v/release/cyub/handy-transcribe.svg)](https://github.com/cyub/handy-transcribe/releases/latest)
+[![license](https://img.shields.io/badge/license-MIT-blue.svg)](#license)
 
 > **Unofficial.** This is a community CLI built on top of Handy's pipeline and the
 > [`transcribe-cpp`](https://github.com/handy-computer/transcribe.cpp) engine. It is not affiliated
