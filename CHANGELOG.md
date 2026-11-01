@@ -6,6 +6,20 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-11-01
+
+### Added
+
+- `--list-models` now shows the languages each model supports (compact column, e.g. `zh,en,ja+18`)
+  and prints a proper header row.
+- `--list-models --language <code>` filters the catalog by primary subtag (`zh` also matches `zh-CN`),
+  hides helper models (language ID, VAD) that transcribe nothing, and sorts the result smallest first.
+- `--list-models --json` emits the full metadata per model: languages, capabilities, license,
+  parameters, size and cache status.
+- Transcription warns when `-l/--language` is not among the selected model's supported languages, so a
+  wrong-model run no longer produces silent garbage. The hint itself is unchanged (it still goes to
+  the decoder).
+
 ### Documentation
 
 - READMEs now invite community translations and explain that a quick-start level translation is

@@ -81,7 +81,8 @@ struct Cli {
     #[arg(long)]
     cache_dir: Option<PathBuf>,
 
-    /// List Handy's catalog models (with cache status) and exit
+    /// List Handy's catalog models (with cache status and supported languages) and exit.
+    /// Combine with --language to filter, and with --json for machine-readable output
     #[arg(long)]
     list_models: bool,
 
@@ -104,7 +105,7 @@ fn run() -> Result<()> {
     let cache_dir = cli.cache_dir.clone().unwrap_or_else(default_cache_dir);
 
     if cli.list_models {
-        return list_models(&cache_dir);
+        return list_models(&cache_dir, cli.language.as_deref(), cli.json);
     }
 
     // Must happen once, before any model (including the VAD model) loads.
@@ -155,6 +156,21 @@ fn run() -> Result<()> {
         "Loaded model {} on {} ({}) in {}ms",
         cli.model, engine.backend_name, engine.device_label, load_ms
     );
+
+    // The model is chosen before we know what is in the audio, so a language the model does not
+    // list is a likely wrong-model situation: say so instead of silently emitting garbage.
+    if let Some(requested) = cli.language.as_deref() {
+        if !engine.languages.is_empty() && !language_matches(requested, &engine.languages) {
+            eprintln!(
+                "warning: {} does not list '{}' among its languages ({}); the transcript may be \
+                 wrong — try --list-models --language {}",
+                cli.model,
+                requested,
+                engine.languages.join(", "),
+                requested
+            );
+        }
+    }
 
     // The VAD is only fetched when the model actually needs chunking.
     let chunked = !cli.no_chunk && !engine.streaming && !engine.long_form;
@@ -224,21 +240,145 @@ fn emit(line: &str) {
     let _ = writeln!(out, "{line}");
 }
 
-fn list_models(cache_dir: &Path) -> Result<()> {
-    emit("Handy catalog models (✓ = cached):");
-    for m in models() {
-        let file = m.files.get(&m.quant).or_else(|| m.files.values().next());
-        let (size_mb, cached) = match file {
-            Some(f) => (
-                f.size as f64 / 1_000_000.0,
-                cache_dir.join("models").join(&f.filename).is_file(),
-            ),
-            None => (0.0, false),
+/// Primary subtag of a language code, lowercased: "zh-CN" -> "zh", "en_US" -> "en".
+fn primary_tag(code: &str) -> String {
+    code.split(['-', '_'])
+        .next()
+        .unwrap_or(code)
+        .to_ascii_lowercase()
+}
+
+fn language_matches(requested: &str, supported: &[String]) -> bool {
+    let want = primary_tag(requested);
+    supported.iter().any(|code| primary_tag(code) == want)
+}
+
+/// Compact language column: "zh,en,ja+18".
+fn languages_label(languages: &[String]) -> String {
+    const MAX: usize = 18;
+    if languages.is_empty() {
+        return "-".to_string();
+    }
+    let mut label = String::new();
+    let mut shown = 0usize;
+    for language in languages {
+        let candidate = if label.is_empty() {
+            language.clone()
+        } else {
+            format!("{label},{language}")
         };
-        let mark = if cached { "✓" } else { " " };
+        if shown > 0 && candidate.len() + 4 > MAX {
+            break;
+        }
+        label = candidate;
+        shown += 1;
+    }
+    let rest = languages.len() - shown;
+    if rest > 0 {
+        label.push_str(&format!("+{rest}"));
+    }
+    label
+}
+
+fn model_size_bytes(model: &crate::model::ModelEntry) -> u64 {
+    model
+        .files
+        .get(&model.quant)
+        .or_else(|| model.files.values().next())
+        .map(|file| file.size)
+        .unwrap_or(0)
+}
+
+fn list_models(cache_dir: &Path, language: Option<&str>, as_json: bool) -> Result<()> {
+    let mut entries: Vec<_> = models()
+        .iter()
+        .filter(|model| match language {
+            // Filtering by language is a "which model can transcribe this" question, so skip the
+            // helper models (language ID, VAD) that list every language but transcribe nothing.
+            Some(requested) => {
+                !matches!(model.role.as_str(), "langid" | "vad")
+                    && language_matches(requested, &model.languages)
+            }
+            None => true,
+        })
+        .collect();
+
+    if let Some(requested) = language {
+        if entries.is_empty() {
+            eprintln!("warning: no catalog model lists '{requested}'");
+        }
+        // Smallest first: for a given language that is usually the fastest useful option.
+        entries.sort_by_key(|model| model_size_bytes(model));
+    }
+
+    if as_json {
+        let payload: Vec<_> = entries
+            .iter()
+            .map(|model| {
+                let size_bytes = model_size_bytes(model);
+                let filename = model
+                    .files
+                    .get(&model.quant)
+                    .or_else(|| model.files.values().next())
+                    .map(|file| file.filename.clone())
+                    .unwrap_or_default();
+                serde_json::json!({
+                    "id": model.id,
+                    "name": model.name,
+                    "family": model.family,
+                    "role": model.role,
+                    "quant": model.quant,
+                    "description": model.description,
+                    "languages": model.languages,
+                    "capabilities": {
+                        "streaming": model.capabilities.streaming,
+                        "translate": model.capabilities.translate,
+                        "language_detection": model.capabilities.language_detection,
+                        "timestamps": model.capabilities.timestamps,
+                    },
+                    "license": model.license,
+                    "parameters": model.parameters,
+                    "size_bytes": size_bytes,
+                    "size_mb": (size_bytes as f64 / 1_000_000.0).round() as u64,
+                    "cached": cache_dir.join("models").join(filename).is_file(),
+                })
+            })
+            .collect();
+        emit(&serde_json::to_string(&payload)?);
+        return Ok(());
+    }
+
+    emit(&match language {
+        Some(requested) => {
+            format!("Handy catalog models supporting '{requested}' (✓ = cached), smallest first:")
+        }
+        None => "Handy catalog models (✓ = cached):".to_string(),
+    });
+    emit(&format!(
+        "  {:<40} {:>8}  {:<9} {:<14} {:<18} {}",
+        "id", "size", "role", "family", "languages", "name"
+    ));
+    for model in &entries {
+        let size_mb = model_size_bytes(model) as f64 / 1_000_000.0;
+        let filename = model
+            .files
+            .get(&model.quant)
+            .or_else(|| model.files.values().next())
+            .map(|file| file.filename.clone())
+            .unwrap_or_default();
+        let mark = if cache_dir.join("models").join(filename).is_file() {
+            "✓"
+        } else {
+            " "
+        };
         emit(&format!(
-            "{mark} {:<40} {:>7.0}MB  {:<9} {:<12} {}",
-            m.id, size_mb, m.role, m.family, m.name
+            "{mark} {:<40} {:>6.0}MB  {:<9} {:<14} {:<18} {}",
+            model.id,
+            size_mb,
+            model.role,
+            model.family,
+            languages_label(&model.languages),
+            model.name
         ));
     }
     Ok(())

@@ -124,7 +124,7 @@ best.
 | `-o, --output <file>` | Write the transcript to a file instead of stdout |
 | `--json` | Emit machine-readable JSON |
 | `--cache-dir <dir>` | Model cache directory. Default: the platform cache dir — `~/Library/Caches/handy-transcribe` on macOS, `~/.cache/handy-transcribe` on Linux |
-| `--list-models` | List catalog models with cache status and exit |
+| `--list-models` | List catalog models with cache status and supported languages. Combine with `--language <code>` to filter and `--json` for machine-readable output |
 | `--list-devices` | List `transcribe-cpp` compute devices and exit |
 | `-h, --help`, `-V, --version` | Usual suspects |
 
@@ -134,10 +134,22 @@ MP4-family video containers. Any sample rate is resampled to 16 kHz mono interna
 ## Picking a model
 
 The catalog is inherited from Handy and embedded in the binary, so no network call is needed to list
-it:
+it. Every entry carries the languages it supports, and `--language` filters by the primary subtag
+(`zh` matches `zh-CN`, `en` matches `en-US`):
 
 ```bash
-handy-transcribe --list-models
+handy-transcribe --list-models                 # everything, with a languages column
+handy-transcribe --list-models --language zh   # what can transcribe Chinese, smallest first
+handy-transcribe --list-models --language ja --json
+```
+
+Passing `--language` at transcription time is only a hint for the decoder. If the chosen model does
+not list that language, the run prints a warning instead of quietly producing garbage:
+
+```console
+$ handy-transcribe ./talk.mp3 -m moonshine-tiny-zh -l en
+warning: moonshine-tiny-zh does not list 'en' among its languages (zh); the transcript may be wrong
+         — try --list-models --language en
 ```
 
 A few good starting points:

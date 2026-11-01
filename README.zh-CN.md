@@ -105,12 +105,28 @@ handy-transcribe ./audio.m4a -o transcript.txt
 | `-o, --output <文件>` | 写文件（默认 stdout） |
 | `--json` | JSON 输出 |
 | `--cache-dir <目录>` | 模型缓存目录，默认跟随平台：macOS `~/Library/Caches/handy-transcribe`，Linux `~/.cache/handy-transcribe` |
-| `--list-models` / `--list-devices` | 列出目录模型 / 计算设备 |
+| `--list-models` / `--list-devices` | 列出目录模型（含支持语言）/ 计算设备；`--language <code>` 过滤、`--json` 机器可读 |
 
 支持 mp3、wav、flac、ogg/vorbis、m4a/aac、aiff，以及 MP4 家族视频容器的音轨；任意采样率内部重采样到
 16 kHz mono。
 
 ## 模型下载
+
+先查清楚要用哪个模型再下载：
+
+```bash
+handy-transcribe --list-models                 # 全部模型，含支持语言列
+handy-transcribe --list-models --language zh   # 能转中文的模型，体积从小到大
+handy-transcribe --list-models --language ja --json
+```
+
+转写时传的 `--language` 只是给解码器的提示。如果选的模型不支持该语言，会直接给出警告而不是默默输出乱码：
+
+```console
+$ handy-transcribe ./讲座.mp3 -m moonshine-tiny-zh -l en
+warning: moonshine-tiny-zh does not list 'en' among its languages (zh); the transcript may be wrong
+         — try --list-models --language en
+```
 
 首次使用自动从 Hugging Face 下载并按 `catalog.json` 里的 SHA-256 校验。国内或企业网络可用镜像：
 
