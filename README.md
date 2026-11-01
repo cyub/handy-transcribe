@@ -154,10 +154,11 @@ A few good starting points:
 | Long-form audio | streaming / long-form models (`--no-chunk` is implied for them) | see `--list-models` |
 
 Models are downloaded on first use from the Hugging Face Hub and verified against the SHA-256 in the
-catalog. To use a mirror or a corporate proxy endpoint:
+catalog. If the Hub is slow or unreachable on your network, point the downloader at a mirror or an
+internal proxy:
 
 ```bash
-export HF_ENDPOINT=https://hf-mirror.com     # or HANDY_HF_ENDPOINT, which takes precedence
+export HF_ENDPOINT=https://your-hub-mirror.example   # HANDY_HF_ENDPOINT takes precedence
 handy-transcribe ./audio.mp3
 ```
 
@@ -230,6 +231,3 @@ license is embedded in `catalog.json` and printed in the catalog's source reposi
 - [symphonia](https://github.com/pdeljanov/Symphonia), [rubato](https://github.com/HEnquist/rubato),
   [Silero VAD](https://github.com/snakers4/silero-vad) — decoding, resampling, voice activity.
 
----
-
-中文文档：[README.zh-CN.md](README.zh-CN.md)

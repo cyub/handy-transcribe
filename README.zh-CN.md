@@ -140,6 +140,3 @@ handy-transcribe ./audio.mp3
 [symphonia](https://github.com/pdeljanov/Symphonia)、[rubato](https://github.com/HEnquist/rubato)、
 [Silero VAD](https://github.com/snakers4/silero-vad)。
 
----
-
-English: [README.md](README.md)
