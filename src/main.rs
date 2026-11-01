@@ -13,6 +13,7 @@ mod vad;
 
 use anyhow::{anyhow, Result};
 use clap::Parser;
+use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::time::Instant;
 
@@ -191,9 +192,8 @@ fn run() -> Result<()> {
         } else {
             0.0
         };
-        println!(
-            "{}",
-            serde_json::json!({
+        emit(
+            &serde_json::json!({
                 "model": cli.model,
                 "backend": engine.backend_name,
                 "device": engine.device_label,
@@ -204,19 +204,28 @@ fn run() -> Result<()> {
                 "detected_language": outcome.detected_language,
                 "text": text,
             })
+            .to_string(),
         );
     } else if let Some(path) = cli.output {
         std::fs::write(&path, &text)?;
         eprintln!("Wrote {} to {}", text.len(), path.display());
     } else {
-        println!("{text}");
+        emit(&text);
     }
 
     Ok(())
 }
 
+/// Writes one line to stdout, treating a closed pipe as a normal end of output.
+/// Without this, `handy-transcribe --list-models | head` would panic with
+/// "failed printing to stdout: Broken pipe".
+fn emit(line: &str) {
+    let mut out = std::io::stdout().lock();
+    let _ = writeln!(out, "{line}");
+}
+
 fn list_models(cache_dir: &Path) -> Result<()> {
-    println!("Handy catalog models (✓ = cached):");
+    emit("Handy catalog models (✓ = cached):");
     for m in models() {
         let file = m.files.get(&m.quant).or_else(|| m.files.values().next());
         let (size_mb, cached) = match file {
@@ -227,10 +236,10 @@ fn list_models(cache_dir: &Path) -> Result<()> {
             None => (0.0, false),
         };
         let mark = if cached { "✓" } else { " " };
-        println!(
+        emit(&format!(
             "{mark} {:<40} {:>7.0}MB  {:<9} {:<12} {}",
             m.id, size_mb, m.role, m.family, m.name
-        );
+        ));
     }
     Ok(())
 }
@@ -238,19 +247,19 @@ fn list_models(cache_dir: &Path) -> Result<()> {
 fn list_devices() {
     let devices = Engine::devices();
     if devices.is_empty() {
-        println!("No transcribe-cpp compute devices registered.");
+        emit("No transcribe-cpp compute devices registered.");
         return;
     }
-    println!("transcribe-cpp compute devices:");
+    emit("transcribe-cpp compute devices:");
     for d in &devices {
         let index = d.index.map(|i| i.to_string()).unwrap_or_else(|| "?".into());
-        println!(
+        emit(&format!(
             "  [{}] {} ({:?}, {} MB)",
             index,
             device_label(d),
             d.device_type,
             d.memory_total / 1_000_000
-        );
+        ));
     }
 }
 

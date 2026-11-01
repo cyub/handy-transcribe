@@ -6,6 +6,11 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Fixed
+
+- Output no longer panics with `failed printing to stdout: Broken pipe` when the reader closes early
+  (for example `handy-transcribe --list-models | head`).
+
 ## [0.1.0] - 2026-10-31
 
 ### Added
