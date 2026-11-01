@@ -1,0 +1,19 @@
+# Build output
+/target
+/dist
+
+# Downloaded models / partials
+*.gguf
+*.part
+*.partial
+
+# Editor / OS noise
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Internal / not published
+/DESIGN.md
+/.agents/
+/docs/
